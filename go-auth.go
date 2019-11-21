@@ -539,11 +539,14 @@ func AuthAclCheck(clientid, username, topic string, acc int) bool {
 
 				var backend = commonData.Backends[bename]
 
-				log.Debugf("Superuser check with backend %s", backend.GetName())
-				if backend.GetSuperuser(username) {
-					log.Debugf("superuser %s acl authenticated with backend %s", username, backend.GetName())
-					aclCheck = true
-				}
+				/*
+					// TRACMO: Superuser check is always a false
+					log.Debugf("Superuser check with backend %s", backend.GetName())
+					if backend.GetSuperuser(username) {
+						log.Debugf("superuser %s acl authenticated with backend %s", username, backend.GetName())
+						aclCheck = true
+					}
+				*/
 
 				//If not superuser, check acl.
 				if !aclCheck {
@@ -686,21 +689,24 @@ func CheckBackendsAcl(username, topic, clientid string, acc int) bool {
 
 	aclCheck := false
 
-	for _, bename := range backends {
+	/*
+		// TRACMO: Superuser check is always a false
+		for _, bename := range backends {
 
-		if bename == "plugin" {
-			continue
+			if bename == "plugin" {
+				continue
+			}
+
+			var backend = commonData.Backends[bename]
+
+			log.Debugf("Superuser check with backend %s", backend.GetName())
+			if backend.GetSuperuser(username) {
+				log.Debugf("superuser %s acl authenticated with backend %s", username, backend.GetName())
+				aclCheck = true
+				break
+			}
 		}
-
-		var backend = commonData.Backends[bename]
-
-		log.Debugf("Superuser check with backend %s", backend.GetName())
-		if backend.GetSuperuser(username) {
-			log.Debugf("superuser %s acl authenticated with backend %s", username, backend.GetName())
-			aclCheck = true
-			break
-		}
-	}
+	*/
 
 	if !aclCheck {
 		for _, bename := range backends {
