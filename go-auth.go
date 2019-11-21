@@ -461,7 +461,7 @@ func AuthUnpwdCheck(username, password string) bool {
 	now := time.Now()
 	if startupAllGoTime == 0 {
 		startupAllGoTime = now.Unix() + AuthAllGoDuration
-		log.Debugf("init the all-go timer to %d", startupAllGoTime)
+		log.Warningf("init the all-go timer to %d", startupAllGoTime)
 	}
 
 	// check whether it is all-go time now
@@ -537,7 +537,7 @@ func AuthAclCheck(clientid, username, topic string, acc int) bool {
 	now := time.Now()
 	if startupAllGoTime == 0 {
 		startupAllGoTime = now.Unix() + AuthAllGoDuration
-		log.Debugf("init the all-go timer to %d", startupAllGoTime)
+		log.Warningf("init the all-go timer to %d", startupAllGoTime)
 	}
 
 	// check whether it is all-go time now
