@@ -73,6 +73,11 @@ var backends []string          //List of selected backends.
 var authOpts map[string]string //Options passed by mosquitto.
 var cache Cache                //Cache conf.
 var commonData CommonData      //General struct with options and conf.
+var startupAllGoTime int64     //Tracking the system initialization time so the auth can have the first few minutes in all-go condition
+
+// when Mosquitto starts up, authentication for the first few minutes is in all-go status
+// this is to prevent all T4 attempts to get in which causes congestion failure
+const AuthAllGoDuration int64 = 60
 
 //export AuthPluginInit
 func AuthPluginInit(keys []string, values []string, authOptsNum int) {
@@ -452,6 +457,21 @@ func AuthPluginInit(keys []string, values []string, authOptsNum int) {
 //export AuthUnpwdCheck
 func AuthUnpwdCheck(username, password string) bool {
 
+	// check whether this Mosquitto session just started up
+	now := time.Now()
+	if startupAllGoTime == 0 {
+		startupAllGoTime = now.Unix() + AuthAllGoDuration
+		log.Debugf("init the all-go timer to %d", startupAllGoTime)
+	}
+
+	// check whether it is all-go time now
+	if now.Unix() < startupAllGoTime {
+		log.Debugf("it is pwd all-go time for %s", username)
+		return true
+	}
+
+	// ---------------------------------------------------
+
 	authenticated := false
 	var cached = false
 	var granted = false
@@ -512,6 +532,21 @@ func AuthUnpwdCheck(username, password string) bool {
 
 //export AuthAclCheck
 func AuthAclCheck(clientid, username, topic string, acc int) bool {
+
+	// check whether this Mosquitto session just started up
+	now := time.Now()
+	if startupAllGoTime == 0 {
+		startupAllGoTime = now.Unix() + AuthAllGoDuration
+		log.Debugf("init the all-go timer to %d", startupAllGoTime)
+	}
+
+	// check whether it is all-go time now
+	if now.Unix() < startupAllGoTime {
+		log.Debugf("it is acl all-go time for %s", username)
+		return true
+	}
+
+	// ---------------------------------------------------
 
 	aclCheck := false
 	var cached = false
