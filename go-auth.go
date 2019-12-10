@@ -656,7 +656,7 @@ func SetAuthCache(username, password string, granted string) error {
 
 //CheckAclCache checks if the username/topic/clientid/acc mix is present in the cache. Return if it's present and, if so, if it was granted privileges.
 func CheckAclCache(username, topic, clientid string, acc int) (bool, bool) {
-	pair := b64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("acl%s%s%s%d", username, topic, clientid, acc)))
+	pair := b64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("acl%s%s%s", username, topic, clientid)))
 	val, err := commonData.RedisCache.Get(pair).Result()
 	if err != nil {
 		return false, false
@@ -671,7 +671,7 @@ func CheckAclCache(username, topic, clientid string, acc int) (bool, bool) {
 
 //SetAclCache sets a mix, granted option and expiration time.
 func SetAclCache(username, topic, clientid string, acc int, granted string) error {
-	pair := b64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("acl%s%s%s%d", username, topic, clientid, acc)))
+	pair := b64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("acl%s%s%s", username, topic, clientid)))
 	err := commonData.RedisCache.Set(pair, granted, time.Duration(commonData.AclCacheSeconds)*time.Second).Err()
 	if err != nil {
 		return err
